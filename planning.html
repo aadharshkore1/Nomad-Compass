@@ -1,0 +1,215 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Travel Planning - Nomad Compass</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+  </head>
+  <body>
+    <header>
+      <div class="logo-container">
+        <i class="fas fa-compass"></i>
+        <h1>Nomad Compass</h1>
+      </div>
+      <button class="hamburger" id="hamburger">
+        <i class="fas fa-bars"></i>
+      </button>
+      <nav id="nav-menu">
+        <a href="{% url 'index' %}">Home</a>
+        <a href="{% url 'planning' %}">Travel Planning</a>
+        <a href="{% url 'booking' %}">Booking</a>
+        <a href="{% url 'guides' %}">Local Guides</a>
+        <a href="{% url 'cultural' %}">Cultural Insights</a>
+        <a href="{% url 'forum' %}">Forum</a>
+        <a href="{% url 'couch' %}">Couchsurfing</a>
+        <a href="{% url 'expense' %}">Expense</a>
+        <a href="{% url 'profile' %}">Profile</a>
+        <button class="auth-button" id="authButton">Login</button>
+      </nav>
+    </header>
+
+    <div class="planner-container">
+      <h2>Plan Your European Trip ✈️</h2>
+
+      <form id="tripForm">
+        {% csrf_token %}
+        <label for="country">Select Country:</label>
+        <select id="country" name="country">
+          <option value="France">France</option>
+          <option value="Germany">Germany</option>
+          <option value="Italy">Italy</option>
+          <option value="Spain">Spain</option>
+          <option value="United Kingdom">United Kingdom</option>
+          <option value="Netherlands">Netherlands</option>
+          <option value="Switzerland">Switzerland</option>
+        </select>
+
+        <label for="duration">Travel Duration (Days):</label>
+        <input type="number" id="duration" name="duration" placeholder="Enter duration in days" />
+
+        <label for="companions">No. of Companions:</label>
+        <input type="number" id="companions" name="companions" placeholder="0 if solo" />
+
+        <label for="travelMode">Preferred Travel Mode:</label>
+        <select id="travelMode" name="travelMode">
+          <option value="Flight">Flight</option>
+          <option value="Train">Train</option>
+          <option value="Bus">Bus</option>
+        </select>
+
+        <label for="accommodation">Accommodation Type:</label>
+        <select id="accommodation" name="accommodation">
+          <option value="Hotel">Hotel</option>
+          <option value="Hostel">Hostel</option>
+          <option value="Airbnb">Airbnb</option>
+        </select>
+
+        <label for="purpose">Purpose of Travel:</label>
+        <select id="purpose" name="purpose">
+          <option value="Leisure">Leisure</option>
+          <option value="Business">Business</option>
+          <option value="Adventure">Adventure</option>
+        </select>
+
+        <label for="season">Season of Visit:</label>
+        <select id="season" name="season">
+          <option value="Winter">Winter</option>
+          <option value="Spring">Spring</option>
+          <option value="Summer">Summer</option>
+          <option value="Autumn">Autumn</option>
+        </select>
+
+        <button type="button" id="planTrip">Plan My Trip</button>
+      </form>
+
+      <!-- Results Display -->
+      <div id="tripResults" class="hidden">
+        <h3>📍 Your Trip Plan:</h3>
+        <p><strong>Estimated Cost:</strong> <span id="costOutput"></span> £</p>
+        <p>
+          <strong>Budget Category:</strong> <span id="budgetCategory"></span>
+        </p>
+        <p>
+          <strong>Recommended Travel Mode:</strong>
+          <span id="travelModeOutput"></span>
+        </p>
+        <p><strong>Top Attractions:</strong> <span id="placesOutput"></span></p>
+      </div>
+    </div>
+
+    <footer>
+      <p>© 2025 Nomad Compass. All rights reserved.</p>
+    </footer>
+
+    <script src="{% static 'script.js' %}"></script>
+    <script>
+      document.getElementById('planTrip').addEventListener('click', function () {
+        // Collect input values from the form
+        const country = document.getElementById('country').value;
+        const duration = parseInt(document.getElementById('duration').value);
+        const companions = parseInt(document.getElementById('companions').value);
+        const travelMode = document.getElementById('travelMode').value;
+        const accommodation = document.getElementById('accommodation').value;
+        const purpose = document.getElementById('purpose').value;
+        const season = document.getElementById('season').value;
+
+        // Initialize default values for the trip calculations
+        let cost = 0;
+        let budgetCategory = '';
+        let recommendedTravelMode = '';
+        let attractions = [];
+        let accommodationCost = 0;
+        let travelCost = 0;
+        let extraCost = 0;
+
+        // Calculate estimated travel cost based on duration and companions
+        if (duration <= 5) {
+          travelCost = 200 + (companions * 50);  // Low cost for short trips
+        } else if (duration > 5 && duration <= 10) {
+          travelCost = 500 + (companions * 100);  // Mid-range cost for medium duration trips
+        } else {
+          travelCost = 1000 + (companions * 150);  // High cost for long trips
+        }
+
+        // Calculate accommodation cost based on the type of accommodation
+        if (accommodation === "Hotel") {
+          accommodationCost = 100 * duration;  // Hotel is the most expensive option
+        } else if (accommodation === "Airbnb") {
+          accommodationCost = 50 * duration;   // Airbnb is cheaper than a hotel
+        } else if (accommodation === "Hostel") {
+          accommodationCost = 30 * duration;   // Hostels are the cheapest
+        }
+
+        // Calculate additional costs based on the purpose of travel
+        if (purpose === "Business") {
+          extraCost = 200;  // Business trips might involve extra costs for meetings and accommodations
+        } else if (purpose === "Adventure") {
+          extraCost = 100;  // Adventure trips might involve costs for activities like hiking or tours
+        }
+
+        // Calculate final total cost
+        cost = travelCost + accommodationCost + extraCost;
+
+        // Determine the budget category based on the total cost
+        if (cost < 600) {
+          budgetCategory = "Economy Budget (Backpacking Style)";
+        } else if (cost >= 600 && cost < 2000) {
+          budgetCategory = "Mid-Range Budget (Standard Travel)";
+        } else {
+          budgetCategory = "Luxury Budget (Premium Travel)";
+        }
+
+        // Recommend travel mode based on the season and duration
+        if (season === "Winter" && duration > 7) {
+          recommendedTravelMode = "Flight (Ideal for long trips during winter)";
+        } else if (season === "Summer" && duration <= 7) {
+          recommendedTravelMode = "Train (Perfect for short trips during summer)";
+        } else {
+          recommendedTravelMode = "Bus (Affordable and convenient for mid-length trips)";
+        }
+
+        // Get top attractions based on the selected country
+        switch (country) {
+          case 'France':
+            attractions = ["Eiffel Tower", "Louvre Museum", "Mont Saint-Michel", "Palace of Versailles"];
+            break;
+          case 'Germany':
+            attractions = ["Brandenburg Gate", "Neuschwanstein Castle", "Berlin Wall Memorial", "Cologne Cathedral"];
+            break;
+          case 'Italy':
+            attractions = ["Colosseum", "Leaning Tower of Pisa", "Venice Canals", "Amalfi Coast"];
+            break;
+          case 'Spain':
+            attractions = ["Sagrada Familia", "Alhambra", "Park Güell", "La Rambla"];
+            break;
+          case 'United Kingdom':
+            attractions = ["Big Ben", "Tower of London", "Stonehenge", "Buckingham Palace"];
+            break;
+          case 'Netherlands':
+            attractions = ["Van Gogh Museum", "Anne Frank House", "Keukenhof Gardens", "Rijksmuseum"];
+            break;
+          case 'Switzerland':
+            attractions = ["Matterhorn", "Jungfraujoch", "Lake Geneva", "Château de Chillon"];
+            break;
+          default:
+            attractions = ["Explore local hidden gems!"];
+        }
+
+        // Display the results
+        document.getElementById('costOutput').textContent = cost + ' £';
+        document.getElementById('budgetCategory').textContent = budgetCategory;
+        document.getElementById('travelModeOutput').textContent = recommendedTravelMode;
+        document.getElementById('placesOutput').textContent = attractions.join(', ');
+
+        // Show the results section
+        document.getElementById('tripResults').classList.remove('hidden');
+      });
+    </script>
+  </body>
+</html>

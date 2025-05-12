@@ -1,0 +1,230 @@
+{% load static %}
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Travel Budgeting Tool</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <style>
+      /* General Styles */
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f4;
+  color: #333;
+}
+
+
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.logo-container i {
+  font-size: 1.5rem;
+  margin-right: 10px;
+}
+
+.auth-button {
+  background: #ee6c4d;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.auth-button:hover {
+  background: #ff4f3e;
+}
+
+.budget-container {
+  max-width: 600px;
+  margin: 30px auto;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h2, h3 {
+  color: #005f73;
+  text-align: center;
+}
+
+input, select, button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+button {
+  background: #005f73;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+}
+
+button:hover {
+  background: #003f52;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+ul li {
+  background: #e0fbfc;
+  margin: 5px 0;
+  padding: 10px;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-between;
+}
+
+#budgetPlan, #convertedAmount {
+  font-weight: bold;
+  text-align: center;
+  margin-top: 10px;
+  color: #ee6c4d;
+}
+
+
+
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo-container">
+        <i class="fas fa-compass"></i>
+        <h1>Nomad Compass</h1>
+      </div>
+      <button class="hamburger" id="hamburger">
+        <i class="fas fa-bars"></i>
+      </button>
+      <nav id="nav-menu">
+        <a href="{% url 'index' %}">Home</a>
+        <a href="{% url 'planning' %}">Travel Planning</a>
+        <a href="{% url 'booking' %}">Booking</a>
+        <a href="{% url 'guides' %}">Local Guides</a>
+        <a href="{% url 'cultural' %}">Cultural Insights</a>
+        <a href="{% url 'forum' %}">Forum</a>
+        <a href="{% url 'couch' %}">Couchsurfing</a>
+        <a href="{% url 'expense' %}">Expense</a>
+        <a href="{% url 'profile' %}">Profile</a>
+        <button class="auth-button" id="authButton">Login</button>
+      </nav>
+    </header>
+
+    <div class="budget-container">
+      <h2>💰 Travel Budgeting Tool</h2>
+
+      <!-- Expense Tracker -->
+      <h3>📊 Expense Tracker</h3>
+      <input type="text" id="expenseName" placeholder="Expense Name" />
+      <input type="number" id="expenseAmount" placeholder="Amount (INR)" />
+      <button onclick="addExpense()">Add Expense</button>
+      <ul id="expenseList"></ul>
+      <p><strong>Total Spent:</strong> ₹<span id="totalSpent">0</span></p>
+
+      <!-- Budget Recommendation -->
+      <h3>💡 Budget Recommendation</h3>
+      <select id="budgetType">
+        <option value="low">Low Budget</option>
+        <option value="mid">Mid-Range</option>
+        <option value="luxury">Luxury</option>
+      </select>
+      <button onclick="getBudgetPlan()">Get Plan</button>
+      <p id="budgetPlan"></p>
+
+      <!-- Currency Converter -->
+      <h3>💱 Currency Converter</h3>
+      <input type="number" id="convertAmount" placeholder="Amount (INR)" />
+      <select id="currency">
+        <option value="GBP">GBP</option>
+        <option value="USD">USD</option>
+        <option value="EUR">EUR</option>
+      </select>
+      <button onclick="convertCurrency()">Convert</button>
+      <p id="convertedAmount"></p>
+    </div>
+    <script>
+      let totalSpent = 0;
+const exchangeRates = {
+  USD: 0.012,
+  EUR: 0.011,
+  GBP: 0.0096,
+};
+
+function addExpense() {
+  let name = document.getElementById("expenseName").value;
+  let amount = parseFloat(document.getElementById("expenseAmount").value);
+  if (!name || isNaN(amount) || amount <= 0) {
+    alert("Please enter a valid expense name and amount.");
+    return;
+  }
+
+  totalSpent += amount;
+  document.getElementById("totalSpent").innerText = totalSpent;
+
+  let expenseList = document.getElementById("expenseList");
+  let listItem = document.createElement("li");
+  listItem.textContent = `${name}: ₹${amount}`;
+  expenseList.appendChild(listItem);
+
+  document.getElementById("expenseName").value = "";
+  document.getElementById("expenseAmount").value = "";
+}
+
+function getBudgetPlan() {
+  let budgetType = document.getElementById("budgetType").value;
+  let budgetPlanText = "";
+  switch (budgetType) {
+    case "low":
+      budgetPlanText = "Recommended budget: ₹10,000 - ₹20,000 per week";
+      break;
+    case "mid":
+      budgetPlanText = "Recommended budget: ₹30,000 - ₹50,000 per week";
+      break;
+    case "luxury":
+      budgetPlanText = "Recommended budget: ₹70,000+ per week";
+      break;
+  }
+  document.getElementById("budgetPlan").innerText = budgetPlanText;
+}
+
+function convertCurrency() {
+  let amount = parseFloat(document.getElementById("convertAmount").value);
+  let currency = document.getElementById("currency").value;
+  if (isNaN(amount) || amount <= 0) {
+    alert("Please enter a valid amount in INR.");
+    return;
+  }
+
+  let convertedAmount = amount * exchangeRates[currency];
+  document.getElementById("convertedAmount").innerText = `Converted: ${convertedAmount.toFixed(2)} ${currency}`;
+}
+
+document.getElementById("authButton").addEventListener("click", function () {
+  alert("Login functionality will be implemented soon!");
+});
+
+document.getElementById("hamburger").addEventListener("click", function () {
+  document.getElementById("nav-menu").classList.toggle("active");
+});
+
+    
+    </script>
+  </body>
+</html>

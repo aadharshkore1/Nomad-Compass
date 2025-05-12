@@ -1,0 +1,87 @@
+{% load static %}
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cultural Insights - Nomad Compass</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+  </head>
+  <body>
+    <header>
+      <div class="logo-container">
+        <i class="fas fa-compass"></i>
+        <h1>Nomad Compass</h1>
+      </div>
+      <button class="hamburger" id="hamburger">
+        <i class="fas fa-bars"></i>
+      </button>
+      <nav id="nav-menu">
+        <a href="{% url 'index' %}">Home</a>
+        <a href="{% url 'planning' %}">Travel Planning</a>
+        <a href="{% url 'booking' %}">Booking</a>
+        <a href="{% url 'guides' %}">Local Guides</a>
+        <a href="{% url 'cultural' %}">Cultural Insights</a>
+        <a href="{% url 'forum' %}">Forum</a>
+        <a href="{% url 'couch' %}">Couchsurfing</a>
+        <a href="{% url 'expense' %}">Expense</a>
+        <a href="{% url 'profile' %}">Profile</a>
+        <button class="auth-button" id="authButton">Login</button>
+      </nav>
+    </header>
+
+    <div class="tourist-info-container">
+      <h2>🌍 Travel Guide for Your Destination</h2>
+
+      <form id="touristForm">
+        {% csrf_token %}
+        <label for="country">Select Country:</label>
+        <select id="country">
+          <option value="France">France</option>
+          <option value="Italy">Italy</option>
+          <option value="Germany">Germany</option>
+          <option value="Spain">Spain</option>
+          <option value="United Kingdom">United Kingdom</option>
+        </select>
+
+        <button type="button" id="getTouristInfo">Get Travel Info</button>
+      </form>
+
+      <div id="touristResults" class="hidden">
+        <h3>📌 Travel Information:</h3>
+        <ul id="touristList"></ul>
+      </div>
+    </div>
+
+    <!-- ✅ Cultural Insights Section -->
+    <div class="cultural-insights-container">
+      <h2>🎭 Cultural Insights</h2>
+
+      <div>
+        <h3>🎎 Customs &amp; Etiquette</h3>
+        <p id="customsInfo">Select a country to see cultural etiquette.</p>
+      </div>
+
+      <div>
+        <h3>🎉 Festivals &amp; Events</h3>
+        <button onclick="showFestivals()">Show Upcoming Festivals</button>
+        <ul id="festivalList"></ul>
+      </div>
+
+      <div>
+        <h3>🍽️ Food &amp; Drink</h3>
+        <button onclick="showFood()">Show Local Cuisine</button>
+        <ul id="foodList"></ul>
+      </div>
+    </div>
+
+    <footer>
+      <p>© 2025 Nomad Compass. All rights reserved.</p>
+    </footer>
+
+    <script src="{% static 'js/script.js' %}"></script>
+  </body>
+</html>

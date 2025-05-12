@@ -1,0 +1,75 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Booking - Nomad Compass</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <i class="fas fa-compass"></i>
+            <h1>Nomad Compass</h1>
+        </div>
+        <button class="hamburger" id="hamburger">
+            <i class="fas fa-bars"></i>
+        </button>
+        <nav id="nav-menu">
+            <a href="{% url 'index' %}">Home</a>
+            <a href="{% url 'planning' %}">Travel Planning</a>
+            <a href="{% url 'booking' %}" class="active">Booking</a>
+            <a href="{% url 'guides' %}">Local Guides</a>
+            <a href="{% url 'cultural' %}">Cultural Insights</a>
+            <a href="{% url 'forum' %}">Forum</a>
+            <a href="{% url 'couch' %}">Couchsurfing</a>
+            <a href="{% url 'expense' %}">Expense</a>
+            <a href="{% url 'profile' %}">Profile</a>
+            <button class="auth-button" id="authButton">Login</button>
+        </nav>
+    </header>
+
+    <section class="booking-section">
+        <div class="booking-container">
+            <h2>🏨 Find Your Perfect Stay</h2>
+
+            <div class="hotel-list">
+                {% for hotel in hotels %}
+                <div class="hotel-card">
+                    <img src="{{ hotel.image.url }}" alt="{{ hotel.name }}" class="hotel-img">
+                    <div class="hotel-info">
+                        <h3>{{ hotel.name }}</h3>
+                        <p>📍 {{ hotel.location }}</p>
+                        <p>💰 ₹{{ hotel.price_per_night }} per night</p>
+                        <p>⭐ {{ hotel.star_rating }} Stars</p>
+                        <h4>Available Rooms:</h4>
+                        <ul>
+                            {% for room in hotel.rooms.all %}
+                                <li>{{ room.room_type }} - ₹{{ room.price }} 
+                                    {% if room.available %}
+                                        (Available)
+                                    {% else %}
+                                        (Booked)
+                                    {% endif %}
+                                </li>
+                            {% empty %}
+                                <li>No rooms available</li>
+                            {% endfor %}
+                        </ul>
+                        <button class="book-now">Book Now</button>
+                    </div>
+                </div>
+                {% empty %}
+                <p>No hotels found.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2025 Nomad Compass. All rights reserved.</p>
+    </footer>
+</body>
+</html>

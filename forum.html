@@ -1,0 +1,60 @@
+{% load static %}
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nomad Compass Forum</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+  </head>
+  <body>
+    <header>
+      <div class="logo-container">
+        <i class="fas fa-compass"></i>
+        <h1>Nomad Compass</h1>
+      </div>
+      <button class="hamburger" id="hamburger">
+        <i class="fas fa-bars"></i>
+      </button>
+      <nav id="nav-menu">
+        <a href="{% url 'index' %}">Home</a>
+        <a href="{% url 'planning' %}">Travel Planning</a>
+        <a href="{% url 'booking' %}">Booking</a>
+        <a href="{% url 'guides' %}">Local Guides</a>
+        <a href="{% url 'cultural' %}">Cultural Insights</a>
+        <a href="{% url 'forum' %}">Forum</a>
+        <a href="{% url 'couch' %}">Couchsurfing</a>
+        <a href="{% url 'expense' %}">Expense</a>
+        <a href="{% url 'profile' %}">Profile</a>
+        <button class="auth-button" id="authButton">Login</button>
+      </nav>
+    </header>
+
+    <div class="forum-container">
+      <h2>🌍 Travel Forum</h2>
+
+      <!-- Post Form -->
+      <div class="post-form">
+        <textarea
+          id="postText"
+          placeholder="Ask a travel question or share your experience..."
+        ></textarea>
+        <button id="postButton">Post</button>
+      </div>
+
+      <!-- Forum Posts -->
+      <div class="forum-posts" id="forumPosts">
+        <!-- Posts will be dynamically added here -->
+      </div>
+    </div>
+
+    <footer>
+      <p>© 2025 Nomad Compass. All rights reserved.</p>
+    </footer>
+
+    <script src="{% static 'js/script.js' %}"></script>
+  </body>
+</html>

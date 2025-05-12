@@ -1,0 +1,195 @@
+{% load static %}
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nomad Compass</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+    <script
+      src="https://kit.fontawesome.com/your-kit-code.js"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <header>
+      <div class="logo-container">
+        <i class="fas fa-compass"></i>
+        <h1>Nomad Compass</h1>
+      </div>
+      <button class="hamburger" id="hamburger">
+        <i class="fas fa-bars"></i>
+      </button>
+      <nav id="nav-menu">
+        <a href="{% url 'index' %}">Home</a>
+        <a href="{% url 'planning' %}">Travel Planning</a>
+        <a href="{% url 'booking' %}">Booking</a>
+        <a href="{% url 'guides' %}">Local Guides</a>
+        <a href="{% url 'cultural' %}">Cultural Insights</a>
+        <a href="{% url 'forum' %}">Forum</a>
+        <a href="{% url 'couch' %}">Couchsurfing</a>
+        <a href="{% url 'expense' %}">Expense</a>
+        <a href="{% url 'profile' %}">Profile</a>
+        <button class="auth-button" id="authButton">Login</button>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="overlay"></div>
+      <div class="content">
+        <h2>Welcome to Nomad Compass</h2>
+        <p>Your all-in-one travel companion.</p>
+        <div class="cta-buttons">
+          <a href="{% url 'planning' %}" class="cta-button">Plan Your Trip</a>
+          <a href="{% url 'booking' %}" class="cta-button">Book Your Stay</a>
+          <a href="{% url 'guides' %}" class="cta-button">Find Local Guides</a>
+        </div>
+      </div>
+    </section>
+    <!-- SOS Button & Emergency Contact Input -->
+    <div class="sos-container">
+      <button id="sosButton" class="sos-button">Activate SOS</button>
+
+      <!-- Emergency Contact Form -->
+      <div id="emergencyForm" class="hidden">
+        <h3>Enter Emergency Contacts</h3>
+        <input type="text" id="contact1" placeholder="Friend/Family Number" />
+        <input
+          type="text"
+          id="contact2"
+          placeholder="Another Contact (Optional)"
+        />
+        <button id="saveContacts">Save Contacts</button>
+      </div>
+
+      <p id="sosMessage" class="hidden">
+        ⚠️ SOS Mode Activated! Authorities and contacts are being notified. ⚠️
+      </p>
+    </div>
+
+    <!-- SOS Confirmation Popup -->
+    <div id="sosPopup" class="popup hidden">
+      <p>⚠️ SOS will be sent in <span id="countdown">5</span> seconds!</p>
+      <button id="cancelSOS">Cancel</button>
+    </div>
+
+    <footer>
+      <p>© 2025 Nomad Compass. All rights reserved.</p>
+    </footer>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const sosButton = document.getElementById("sosButton");
+        const sosMessage = document.getElementById("sosMessage");
+        const emergencyForm = document.getElementById("emergencyForm");
+        const saveContacts = document.getElementById("saveContacts");
+        const sosPopup = document.getElementById("sosPopup");
+        const countdownSpan = document.getElementById("countdown");
+        const cancelSOS = document.getElementById("cancelSOS");
+    
+        let emergencyContacts = [];
+        let countdown;
+        let countdownTime = 5;
+    
+        // Toggle SOS Mode
+        sosButton.addEventListener("click", function () {
+            if (!sosButton.classList.contains("sos-active")) {
+                // If no contacts are saved, show input form
+                if (emergencyContacts.length === 0) {
+                    emergencyForm.classList.remove("hidden");
+                    return;
+                }
+    
+                // Show confirmation popup with countdown
+                sosPopup.classList.remove("hidden");
+                countdownSpan.textContent = countdownTime;
+                countdown = setInterval(startCountdown, 1000);
+            } else {
+                // Deactivate SOS Mode
+                sosButton.classList.remove("sos-active");
+                sosMessage.classList.add("hidden");
+                sosButton.textContent = "Activate SOS";
+            }
+        });
+    
+        // Save emergency contacts
+        saveContacts.addEventListener("click", function () {
+            let contact1 = document.getElementById("contact1").value;
+            let contact2 = document.getElementById("contact2").value;
+    
+            if (contact1) {
+                emergencyContacts = [contact1];
+                if (contact2) emergencyContacts.push(contact2);
+    
+                alert("Emergency contacts saved!");
+                emergencyForm.classList.add("hidden");
+            } else {
+                alert("Please enter at least one contact number.");
+            }
+        });
+    
+        // Start countdown for SOS alert
+        function startCountdown() {
+            countdownTime--;
+            countdownSpan.textContent = countdownTime;
+    
+            if (countdownTime === 0) {
+                clearInterval(countdown);
+                sosPopup.classList.add("hidden");
+                activateSOS();
+                countdownTime = 5;
+            }
+        }
+    
+        // Cancel SOS alert
+        cancelSOS.addEventListener("click", function () {
+            clearInterval(countdown);
+            sosPopup.classList.add("hidden");
+            countdownTime = 5;
+        });
+    
+        // Activate SOS Mode (Send Alerts)
+        function activateSOS() {
+            sosButton.classList.add("sos-active");
+            sosMessage.classList.remove("hidden");
+            sosButton.textContent = "Deactivate SOS";
+    
+            getUserLocation();
+        }
+    
+        // Get user location and send alert
+        function getUserLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(sendSOSAlert, handleLocationError);
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+    
+        // Send location to police and emergency contacts
+        function sendSOSAlert(position) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            const locationURL = `https://www.google.com/maps?q=${latitude},${longitude}`;
+    
+            alert(`🚨 SOS Alert Sent! Location: ${locationURL}`);
+    
+            // Send location to the nearest police station (You will integrate this with the backend)
+            console.log("Sending SOS to police with location:", locationURL);
+    
+            // Send alert to emergency contacts
+            emergencyContacts.forEach(contact => {
+                console.log(`Sending SOS alert to ${contact} with location: ${locationURL}`);
+            });
+    
+            // You can integrate an SMS API here for sending messages
+        }
+    
+        // Handle location error
+        function handleLocationError(error) {
+            alert("Unable to fetch location. Please check location permissions.");
+            console.error("Error getting location:", error);
+        }
+    });
+    </script>
+  </body>
+</html>

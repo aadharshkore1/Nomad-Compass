@@ -1,0 +1,219 @@
+{% load static %}
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Couchsurfing - Nomad Compass</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <style>
+      .host-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        padding: 20px;
+      }
+      .host-card {
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        overflow: hidden;
+        padding: 15px;
+        background: #f9f9f9;
+        transition: box-shadow 0.3s ease-in-out;
+      }
+      .host-card:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      .host-card img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 10px;
+      }
+      .host-card h4 {
+        margin: 10px 0;
+      }
+      .loading-spinner {
+        display: none;
+        border: 4px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 4px solid #3498db;
+        width: 30px;
+        height: 30px;
+        animation: spin 1s linear infinite;
+        margin: 20px auto;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo-container">
+        <i class="fas fa-compass"></i>
+        <h1>Nomad Compass</h1>
+      </div>
+      <button class="hamburger" id="hamburger">
+        <i class="fas fa-bars"></i>
+      </button>
+      <nav id="nav-menu">
+        <a href="index.html">Home</a>
+        <a href="planning.html">Travel Planning</a>
+        <a href="booking.html">Booking</a>
+        <a href="guides.html">Local Guides</a>
+        <a href="cultural.html">Cultural Insights</a>
+        <a href="forum.html">Forum</a>
+        <a href="couch.html">Couchsurfing</a>
+        <a href="expense.html">Expense</a>
+        <a href="profile.html">Profile</a>
+        <button class="auth-button" id="authButton">Login</button>
+      </nav>
+    </header>
+
+    <div class="couchsurfing-container">
+      <h2>🏡 Couchsurfing: Find a Host or List Your Place</h2>
+      <div class="tabs">
+        <button class="tab-button active" onclick="switchTab('find')">
+          Find a Host
+        </button>
+        <button class="tab-button" onclick="switchTab('list')">
+          List Your Place
+        </button>
+      </div>
+
+      <div id="findHost" class="tab-content">
+        <h3>🌍 Search for Hosts</h3>
+        <input
+          type="text"
+          id="locationSearch"
+          placeholder="Enter city or country"
+        />
+        <button onclick="searchHosts()">Search</button>
+        <div class="loading-spinner" id="loadingSpinner"></div>
+        <div id="hostResults" class="host-grid"></div>
+      </div>
+
+      <div id="listPlace" class="tab-content hidden">
+        <h3>🏠 List Your Place</h3>
+        <input type="text" id="hostName" placeholder="Your Name" />
+        <input type="text" id="hostLocation" placeholder="Your City" />
+        <textarea id="hostDetails" placeholder="Describe your place"></textarea>
+        <button onclick="listYourPlace()">Submit</button>
+        <p id="listSuccess" class="hidden">🎉 Your place has been listed!</p>
+      </div>
+    </div>
+
+    <footer>
+      <p>© 2025 Nomad Compass. All rights reserved.</p>
+    </footer>
+
+    <script>
+      let userAddedHosts = [];
+
+      function switchTab(tab) {
+        document.querySelectorAll('.tab-content').forEach((content) => {
+          content.classList.add('hidden');
+        });
+        document.querySelectorAll('.tab-button').forEach((button) => {
+          button.classList.remove('active');
+        });
+        document.getElementById(tab + 'Host').classList.remove('hidden');
+        document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
+      }
+
+      function searchHosts() {
+        const hostResults = document.getElementById('hostResults');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+
+        hostResults.innerHTML = '';
+        loadingSpinner.style.display = 'block';
+
+        setTimeout(() => {
+          loadingSpinner.style.display = 'none';
+
+          const sampleHosts = [
+            {
+              name: 'John Doe',
+              location: 'Paris, France',
+              description: 'A cozy apartment near the Eiffel Tower.',
+              img: 'mansion.jpg',
+              contact: 'john@example.com',
+            },
+            {
+              name: 'Emma Smith',
+              location: 'Tokyo, Japan',
+              description: 'Traditional Japanese house with a lovely garden.',
+              img: 'japan.jpg',
+              contact: 'emma@example.com',
+            },
+            {
+              name: 'Carlos Mendes',
+              location: 'Rio de Janeiro, Brazil',
+              description: 'Beachside view with a vibrant city atmosphere.',
+              img: 'beach.jpg',
+              contact: 'carlos@example.com',
+            },
+          ];
+
+          const allHosts = [...sampleHosts, ...userAddedHosts];
+
+          allHosts.forEach((host) => {
+            const card = document.createElement('div');
+            card.classList.add('host-card');
+            card.innerHTML = `
+              <img src="${host.img}" alt="Host House" onerror="this.src='default.jpg';">
+              <h4>${host.name}</h4>
+              <p><strong>Location:</strong> ${host.location}</p>
+              <p>${host.description}</p>
+              <p><strong>Contact:</strong> ${host.contact}</p>
+            `;
+            hostResults.appendChild(card);
+          });
+        }, 2000);
+      }
+
+      function listYourPlace() {
+        const hostName = document.getElementById('hostName').value;
+        const hostLocation = document.getElementById('hostLocation').value;
+        const hostDetails = document.getElementById('hostDetails').value;
+        const listSuccess = document.getElementById('listSuccess');
+
+        if (hostName && hostLocation && hostDetails) {
+          const newHost = {
+            name: hostName,
+            location: hostLocation,
+            description: hostDetails,
+            img: 'default.jpg',
+            contact: 'contact@example.com',
+          };
+
+          userAddedHosts.push(newHost);
+
+          listSuccess.classList.remove('hidden');
+          setTimeout(() => {
+            listSuccess.classList.add('hidden');
+          }, 3000);
+
+          searchHosts();
+
+          alert(`Host ${hostName} located in ${hostLocation} with description: "${hostDetails}" has been listed successfully!`);
+        } else {
+          alert('Please fill out all fields.');
+        }
+      }
+
+      document.querySelector('.tab-button[onclick="switchTab(\'list\')"]').addEventListener('click', function() {
+        document.getElementById('listPlace').classList.remove('hidden');
+      });
+    </script>
+  </body>
+</html>
